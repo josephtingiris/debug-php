@@ -11,7 +11,7 @@
 
 # Description
 
-This is an initial structure for a composite project that contains code from multiple other open source projects with varying README, LICENSE, CONTRIBUTING, and CODE_OF_CONDUCT files.
+This is a structure for my PHP Debug class composer project.
 
 ## Table of Contents
 
@@ -27,37 +27,12 @@ This is an initial structure for a composite project that contains code from mul
 Download to the project directory, add, and commit.  i.e.:
 
 ```sh
-export Project_Name=my-project
-mkdir $Project_Name && cd $Project_Name
-curl -LOk https://github.com/josephtingiris/debug-php/archive/master.zip && unzip -j master.zip debug-php-master/.github/* -d .github/ && rm -f master.zip
-# (optionally) get debug-php from https://github.com/josephtingiris/github-bin
-debug-php $Project_Name
+composer require josephtingiris/Debug
 ```
 
 ## Usage
 
-1. Create the following files for the project:
-
-* *project*.README.md
-* *project*.TYPE.LICENSE.md
-* *project*.CODE_OF_CONDUCT.md
-* *project*.CONTRIBUTING.md
-
-2. Update the *project* files with links and/or content about the *project*. e.g.:
-
-* Name
-* Description
-* Installation instructions
-* Usage instructions
-* Support instructions
-* Contributing instructions
-
-3. Update the following files with links and/or content to the *project* files.
-
-* README.md
-* LICENSE.md
-* CODE_OF_CONDUCT.md
-* CONTRIBUTING.md
+1. TBD
 
 ## Support
 

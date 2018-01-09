@@ -1,0 +1,26 @@
+{
+    "name": "josephtingiris/Debug",
+    "type": "library",
+    "description": "A PHP class for debugging to stdout.",
+    "keywords": [
+        "debug",
+        "php debug"
+    ],
+    "homepage": "https://github.com/josephtingiris/debug-php",
+    "license": "GPL-3.0",
+    "authors": [
+        {
+            "name": "Joseph Tingiris",
+            "email": "joseph.tingiris@gmail.com",
+            "homepage": "https://josephtingiris.github.io/"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0"
+    },
+    "autoload": {
+        "classmap": [
+            "josephtingiris/Debug.php"
+        ]
+    }
+}
