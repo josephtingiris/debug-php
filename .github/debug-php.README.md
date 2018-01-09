@@ -27,7 +27,7 @@ This is a structure for my PHP Debug class composer project.
 Download to the project directory, add, and commit.  i.e.:
 
 ```sh
-composer require josephtingiris/Debug
+composer require josephtingiris/debug-php
 ```
 
 ## Usage
