@@ -1,5 +1,5 @@
 {
-    "name": "josephtingiris/Debug",
+    "name": "josephtingiris/debug-php",
     "type": "library",
     "description": "A PHP class for debugging to stdout.",
     "keywords": [
