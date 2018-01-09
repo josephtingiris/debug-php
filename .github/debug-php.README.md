@@ -27,12 +27,25 @@ This is a structure for my PHP Debug class composer project.
 Download to the project directory, add, and commit.  i.e.:
 
 ```sh
-composer require josephtingiris/debug-php
+composer require "josephtingiris/debug-php"
 ```
 
 ## Usage
 
-1. TBD
+1. Basic, setting global debug level via construct.
+
+```php
+<?php
+
+require_once(dirname(__FILE__) . "/vendor/autoload.php");
+
+$debug = new \josephtingiris\Debug(10);
+
+$debug->out("level 1 show",1);
+$debug->out("level 2 show",2);
+$debug->out("level 12 no-show",12);
+?>
+```
 
 ## Support
 

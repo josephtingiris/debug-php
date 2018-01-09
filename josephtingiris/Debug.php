@@ -7,9 +7,9 @@
  *
  *              Original author: Joseph Tingiris <joseph.tingiris@gmail.com>
  *
- * @version     0.1.0
+ * @version     0.1.1
  */
-namespace josephtingiris\Debug;
+namespace josephtingiris;
 
 #$GLOBALS["Debug"]=500;
 
