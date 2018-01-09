@@ -20,7 +20,7 @@
     },
     "autoload": {
         "classmap": [
-            "josephtingiris/Debug.php"
+            "Debug.php"
         ]
     }
 }

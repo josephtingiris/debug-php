@@ -1,13 +1,14 @@
 <?php
 /**
- * This is a PHP class in the \josephtingiris namespace.
+ * This is a PHP class in the \josephtingiris namespace, Copyright Joseph Tingiris.
  *
  * @author      Current authors: Joseph Tingiris <joseph.tingiris@gmail.com>
  *                               (next author)
  *
  *              Original author: Joseph Tingiris <joseph.tingiris@gmail.com>
  *
- * @version     0.1.2
+ * @license     GPL-3.0
+ * @version     0.1.3
  */
 namespace josephtingiris;
 
