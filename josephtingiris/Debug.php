@@ -1,13 +1,13 @@
 <?php
 /**
- * This is a PHP class in the \josephtingiris\Debug namespace.
+ * This is a PHP class in the \josephtingiris namespace.
  *
  * @author      Current authors: Joseph Tingiris <joseph.tingiris@gmail.com>
  *                               (next author)
  *
  *              Original author: Joseph Tingiris <joseph.tingiris@gmail.com>
  *
- * @version     0.1.1
+ * @version     0.1.2
  */
 namespace josephtingiris;
 
@@ -280,12 +280,11 @@ class Debug
             $debug_error_log = true;
         }
 
-        // an array of terminals that support ansi color codes
-        // I'm sure there are more ... but these are all that I use
+        // an array of regular expressions for terminals that support ansi color codes
         $color_terms = array(
-            'ansi',
-            'xterm',
-            'xterm-256color',
+            '/ansi/',
+            '/xterm/',
+            '/color/',
         );
         $debug_color = false;
 
@@ -303,7 +302,7 @@ class Debug
             $debug_error_log = false;
 
             foreach ($color_terms as $color_term) {
-                if ($term == $color_term) {
+                if (preg_match($color_term,$term)) {
                     $debug_color = true;
                     break;
                 } else {
