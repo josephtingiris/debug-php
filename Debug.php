@@ -8,7 +8,7 @@
  *              Original author: Joseph Tingiris <joseph.tingiris@gmail.com>
  *
  * @license     GPL-3.0
- * @version     0.1.3
+ * @version     0.1.4
  */
 namespace josephtingiris;
 
@@ -21,7 +21,7 @@ class Debug
 {
 
     /*
-     * public variables.
+     * public properties.
      */
 
     /*
@@ -30,6 +30,20 @@ class Debug
 
     public function __construct($debug_level_construct = null)
     {
+
+        // date() is used throughout; ensure a timezone is set
+
+        if(!ini_get('date.timezone')) {
+            $TZ=@date_default_timezone_get();
+            if (empty($TZ)) {
+                $TZ= getenv('TZ');
+            }
+            if (empty($TZ)) {
+                date_default_timezone_set('UTC');
+            } else {
+                date_default_timezone_set($TZ);
+            }
+        }
 
         if (empty($this->Start_Time)) {
             $this->Start_Time = microtime(true);
@@ -710,7 +724,7 @@ class Debug
     }
 
     /*
-     * private variables.
+     * private properties.
      */
 
     private $Display_Level = null;
@@ -888,7 +902,7 @@ class Debug
     }
 
     /*
-     * protected variables.
+     * protected properties.
      */
 
     /*
