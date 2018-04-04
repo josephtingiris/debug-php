@@ -7,7 +7,8 @@
  *
  *              Original author: Joseph Tingiris <joseph.tingiris@gmail.com>
  *
- * @license     GPL-3.0
+ * @license     https://opensource.org/licenses/GPL-3.0
+ *
  * @version     0.1.4
  */
 namespace josephtingiris;
