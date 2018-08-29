@@ -1,0 +1,22 @@
+# begin Debug.php.include
+
+$Debug_Php="Debug.php";
+$Debug_Php_Dir=dirname(__FILE__);
+while ( !empty($Debug_Php_Dir) && "$Debug_Php_Dir" != "/" ) { # search backwards
+    foreach (array($Debug_Php_Dir, $Debug_Php_Dir."/include/debug-php", $Debug_Php_Dir."/include") as $Debug_Php_Source_Dir) {
+        $Debug_Php_Source=$Debug_Php_Source_Dir."/".$Debug_Php;
+        if ( is_readable($Debug_Php_Source) ) {
+            require_once($Debug_Php_Source);
+            break;
+        } else {
+            unset($Debug_Php_Source);
+        }
+    }
+    if ( !empty($Debug_Php_Source) ) break;
+    $Debug_Php_Dir=dirname("$Debug_Php_Dir");
+}
+if ( empty($Debug_Php_Source) ) { echo "$Debug_Php file not found\n"; exit(1); }
+unset($Debug_Php_Dir, $Debug_Php);
+
+# end Debug.php.include
+
