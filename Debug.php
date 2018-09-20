@@ -1,20 +1,21 @@
 <?php
+
 /**
- * 
+ *
  * Debug.php
- * 
+ *
  * Copyright (C) 2015 Joseph Tingiris
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
@@ -42,9 +43,8 @@ class Debug
      * public properties.
      */
 
-    public $Color_Bold_Max = 9;
+    public $Color_Display_Level_Bold = 9;
     public $Color_Luminosity = 5;
-    public $Hostname_Pad = 2;
 
     /*
      * private properties.
@@ -242,8 +242,8 @@ class Debug
     {
 
         $this->Stop_Time = microtime(true);
-        $this->debug(__CLASS__ . " start time = ".$this->Start_Time,20);
-        $this->debug(__CLASS__ . " stop time = ".$this->Stop_Time,20);
+        $this->debug(__CLASS__ . " start time = " . $this->Start_Time,20);
+        $this->debug(__CLASS__ . " stop time = " . $this->Stop_Time,20);
 
     }
 
@@ -385,36 +385,58 @@ class Debug
             return;
         }
 
-        // get (or set) the global hostname
-
-        if (empty($GLOBALS['HOSTNAME'])) {
-            $hostname = gethostname();
-        } else {
-            $hostname = $GLOBALS['HOSTNAME'];
-        }
-
         // use (or set) the debug_message & padding
 
-        // display main file in backtraces; default padding
-        $debug_message_pad = 25;
-        $backtrace_files = false;
-        $backtrace_classes = false;
+        // default padding
+        $debug_pad_message = 0;
+        $debug_pad_prefix = 14;
 
-        if ($this->Display_Level >= 20) {
-            // display all files in backtraces; increase padding
-            $debug_message_pad = 35;
+        $backtrace_classes = false; // do not display classes
+        $backtrace_dependencies = false; // do not display dependency chain
+        $backtrace_files = false; // do not display files
+        $backtrace_hostname = false; // do not display the hostname
+        $backtrace_paths = false; // do not display full paths
+
+        if ($this->Display_Level > 20) {
+            // display files; increase padding
             $backtrace_files = true;
+            $debug_pad_message = 25;
         }
 
-        if ($this->Display_Level >= 30) {
-            // display classes in backtraces; increase padding
-            $debug_message_pad = 75;
+        if ($this->Display_Level > 40) {
+            // display dependencies; increase padding
+            $backtrace_dependencies = true;
+            $debug_pad_message = 50;
+        }
+
+        if ($this->Display_Level > 60) {
+            // display classes; increase padding
             $backtrace_classes = true;
+            $debug_pad_message = 100;
         }
 
-        #echo "debug_message_pad=$debug_message_pad\n";
+        if ($this->Display_Level > 80) {
+            // display full paths; increase padding
+            $backtrace_paths = true;
+            $debug_pad_message = 200;
+            $debug_pad_prefix = 16;
+        }
 
-        if (($debug_message == null || $debug_message == '') && ($backtrace_files || $backtrace_classes)) {
+        if ($this->Display_Level > 100) {
+            // get (or set) the global hostname
+
+            if (empty($GLOBALS['HOSTNAME'])) {
+                $hostname = gethostname();
+            } else {
+                $hostname = $GLOBALS['HOSTNAME'];
+            }
+
+            $backtrace_hostname = true;
+        }
+
+        #echo "debug_pad_message=$debug_pad_message\n";
+
+        if (($debug_message == null || $debug_message == '')) {
 
             // automatically determine & append the backtrace from the caller
             $backtraces = debug_backtrace();
@@ -424,14 +446,7 @@ class Debug
             $backtrace_class = null;
             $backtrace_function = null;
 
-            $debug_message=null;
-
             foreach ($backtraces as $backtrace) {
-
-                // skip this function
-                if (isset($backtrace['function']) && $backtrace['function'] == __FUNCTION__) {
-                    continue;
-                }
 
                 // skip call_user_func*; they are essentially aliases
                 if (isset($backtrace['function']) && $backtrace['function'] == 'call_user_func') {
@@ -444,136 +459,107 @@ class Debug
 
                 #print_r($backtrace); // testing
 
-                if ($backtrace_files) {
-                    if (isset($backtrace['file']) && !is_null($backtrace['file']) && $backtrace['file'] != '') {
-                        if ($this->Display_Level >= 50) {
-                            // display the entire path
-                            $backtrace_file .= $backtrace['file'];
-                        } else {
-                            // only display the file name
-                            $backtrace_file = basename($backtrace['file']);
-                        }
+                if (isset($backtrace['file']) && !is_null($backtrace['file']) && $backtrace['file'] != '' && $backtrace_files) {
+
+                    if ($backtrace_paths) {
+                        $backtrace_file . $backtrace['file'];
+                        $backtrace_file = $backtrace['file'];
+                    } else {
+                        // only display the file name
+                        $backtrace_file = basename($backtrace['file']);
                     }
 
                     if (isset($backtrace['line']) && !is_null($backtrace['line']) && $backtrace['line'] != '') {
                         $backtrace_line = $backtrace['line'];
-                    }
-
-                    if ($backtrace_classes) {
-                        if (isset($backtrace['class']) && !is_null($backtrace['class']) && $backtrace['class'] != '') {
-
-                            $backtrace_class = null;
-
-                            // every class but this class ...
-                            if ($backtrace['class'] != __CLASS__) {
-
-                                $backtrace_class = $backtrace['class'];
-
-                                if (isset($backtrace['function']) && !is_null($backtrace['function']) && $backtrace['function'] != '') {
-                                    $backtrace_function = $backtrace['function'] . '()';
-                                }
-
-
-                            } else {
-                                // echo "no class ".__CLASS__."\n";
-                            }
-
-                            if (!is_null($backtrace_class) && $backtrace_class != '') {
-                                if ($debug_message == null || $debug_message == '') {
-                                    $debug_message = $backtrace_class . " ";
-                                } else {
-                                    $debug_message .= " > " . $backtrace_class . " ";
-                                }
-                            }
-
-                            if (!is_null($backtrace_function) && $backtrace_function != '') {
-
-                                // every function but this function ...
-                                if ($backtrace['function'] != __FUNCTION__) {
-                                    if ($debug_message == null || $debug_message == '') {
-                                        $debug_message = $backtrace_function . ":";
-                                    } else {
-                                        $debug_message .= "->" . $backtrace_function . ":";
-                                    }
-                                }
-
-                            }
-                        }
-
-                        if (!is_null($backtrace_file) && $backtrace_file != '') {
-                            if ($debug_message == null || $debug_message == '') {
-                                $debug_message = $backtrace_file . ":";
-                            } else {
-                                $debug_message .= " > " . $backtrace_file . ":";
-                            }
-                        }
-
-                        if (!is_null($backtrace_line) && $backtrace_line != '') {
-                            $debug_message .= $backtrace_line;
-                        }
                     }
 
                 } else {
 
-                    // only display the first file in backtraces; use preset padding
-
-                    if (is_null($debug_message)) {
-                        if (!is_null($backtrace_file) && $backtrace_file != '') {
-                            $debug_message = $backtrace_file . ":";
-                        }
-
-                        if (!is_null($backtrace_line) && $backtrace_line != '') {
-                            $debug_message .= $backtrace_line;
-                        }
-
-                    }
+                    $backtrace_file = null;
+                    $backtrace_line = null;
 
                 }
 
-            }
-            unset($backtrace);
+                if ($backtrace_classes) {
+                    if (isset($backtrace['class']) && !is_null($backtrace['class']) && $backtrace['class'] != '') {
 
-            #echo "backtrace_file=$backtrace_file\n";
-            #echo "backtrace_line=$backtrace_line\n";
+                        $backtrace_class = null;
 
-            if ($debug_message == null || $debug_message == '') {
+                        // every class but this class ...
+                        if ($backtrace['class'] != __CLASS__) {
 
-                foreach ($backtraces as $backtrace) {
+                            $backtrace_class = $backtrace['class'];
 
-                    #print_r($backtrace);
+                            if (isset($backtrace['function']) && !is_null($backtrace['function']) && $backtrace['function'] != '') {
+                                $backtrace_function = $backtrace['function'] . '()';
+                            }
 
-                    if (isset($backtrace['file']) && !is_null($backtrace['file']) && $backtrace['file'] != '') {
-                        if ($this->Display_Level >= 50) {
-                            // display the entire path
-                            $backtrace_file = $backtrace['file'];
                         } else {
-                            // only display the file name
-                            $backtrace_file = basename($backtrace['file']);
+                            // echo "no class ".__CLASS__."\n";
                         }
-                    } else {
-                        continue;
-                    }
 
-                    if (isset($backtrace['line']) && !is_null($backtrace['line']) && $backtrace['line'] != '') {
-                        $backtrace_line = $backtrace['line'];
-                    }
+                        if (!is_null($backtrace_class) && $backtrace_class != '') {
+                            if ($debug_message == null || $debug_message == '') {
+                                $debug_message = $backtrace_class;
+                            } else {
+                                $debug_message .= " <- " . $backtrace_class;
+                            }
+                        }
 
+                        if (!is_null($backtrace_function) && $backtrace_function != '') {
+
+                            // every function but this function ...
+                            if ($backtrace['function'] != __FUNCTION__) {
+                                if ($debug_message == null || $debug_message == '') {
+                                    $debug_message = $backtrace_function;
+                                } else {
+                                    $debug_message .= "::" . $backtrace_function;
+                                }
+                            }
+
+                        }
+                    }
+                }
+
+                if ($backtrace_files) {
                     if (!is_null($backtrace_file) && $backtrace_file != '') {
-                        $debug_message .= $backtrace_file . ":";
+                        if ($debug_message == null || $debug_message == '') {
+                            $debug_message = $backtrace_file;
+                        } else {
+                            $debug_message .= " <- " . $backtrace_file;
+                        }
                     }
 
                     if (!is_null($backtrace_line) && $backtrace_line != '') {
-                        $debug_message .= $backtrace_line;
+                        $debug_message .= ":" . $backtrace_line;
+                    }
+                }
+
+                // only display the first file in backtraces; use preset padding
+
+                if ($debug_message == null || $debug_message == '') {
+                    if (!is_null($backtrace_file) && $backtrace_file != '') {
+                        $debug_message = $backtrace_file;
+                    }
+
+                    if (!is_null($backtrace_line) && $backtrace_line != '') {
+                        $debug_message .= ":" . $backtrace_line;
                     }
 
                 }
-                unset($backtrace);
-            } else {
-                # use existing debug_message
+
+                if (!$backtrace_dependencies) {
+                    break;
+                }
             }
+            unset($backtrace);
 
         } else {
-            // use the debug_message given in the function argument
+            // debug_message is not null
+        }
+
+        if ($backtrace_hostname) {
+            $debug_message = $hostname . " : " . $debug_message;
         }
 
         // initialize debug format string
@@ -589,12 +575,10 @@ class Debug
             $debug_tag = 'DEBUG';
         }
 
-        $debug_prefix_pad = 14;
-
         if (empty($debug_level)) {
-            $debug_prefix = str_pad("$debug_tag ", $debug_prefix_pad);
+            $debug_prefix = str_pad("$debug_tag ", $debug_pad_prefix);
         } else {
-            $debug_prefix = str_pad("$debug_tag [$this->Display_Level][$debug_level]", $debug_prefix_pad);
+            $debug_prefix = str_pad("$debug_tag [$this->Display_Level][$debug_level]", $debug_pad_prefix);
         }
 
         if (!empty($GLOBALS['UUID'])) {
@@ -615,19 +599,11 @@ class Debug
             $output = 'NULL';
         }
 
-        if ($debug_message != null && $this->Display_Level >= 10) {
-            // enhanced debuging; includes prefix, plus more
-            $debug_format .= str_pad($debug_prefix, $debug_prefix_pad);
-            if ($this->Display_Level >= 40) {
-                $debug_format .= ' : ' . str_pad($hostname, $this->Hostname_Pad);
-            }
-            $debug_format .= ' : ' . str_pad($debug_message, $debug_message_pad);
-            $debug_format .= ' : ' . $output;
-        } else {
-            // simplified debuging; just prefix & output
-            $debug_format .= str_pad($debug_prefix, $debug_prefix_pad);
-            $debug_format .= ' : ' . $output;
+        $debug_format .= str_pad($debug_prefix, $debug_pad_prefix);
+        if ($debug_message != null && $debug_message != '') {
+            $debug_format .= ' : ' . str_pad($debug_message, $debug_pad_message);
         }
+        $debug_format .= ' : ' . $output;
 
         // if applicable, stop color formatting
 
@@ -865,10 +841,10 @@ class Debug
             $color_luminosity=0;
 
             if (empty($this->json_colors)) {
-                if (!is_readable(dirname(__FILE__)."/color-data.json")) {
+                if (!is_readable(dirname(__FILE__) . "/color-data.json")) {
                     return null;
                 }
-                $this->json_colors=json_decode(file_get_contents(dirname(__FILE__)."/color-data.json"), true);
+                $this->json_colors=json_decode(file_get_contents(dirname(__FILE__) . "/color-data.json"), true);
             }
 
             $color_background_data=null;
@@ -882,7 +858,6 @@ class Debug
             $color_foreground_g=0;
             $color_foreground_b=0;
             $color_foreground_luminosity = 0;
-
 
             // get color_foreground_data
             foreach ($this->json_colors as $json_color) {
@@ -964,16 +939,16 @@ class Debug
             }
 
             if ($html) {
-                if (is_integer($color_code) && $color_code <= $this->Color_Bold_Max) {
+                if (is_integer($color_code) && $color_code <= $this->Color_Display_Level_Bold) {
                     if (isset($color_attributes['bold_on'][0])) {
                         $color.=$color_attributes['bold_on'][0];
                     }
                 }
                 if (isset($color_background_data['hexString']) && (isset($color_foreground_data['hexString']))) {
-                    $color.="<p style=\"color: " . strtoupper($color_foreground_data['hexString']) . "; background-color: " .strtoupper($color_background_data['hexString']) . ";\">";
+                    $color.="<p style=\"color: " . strtoupper($color_foreground_data['hexString']) . "; background-color: " . strtoupper($color_background_data['hexString']) . ";\">";
                 } else {
                     if (isset($color_background_data['hexString'])) {
-                        $color.="<p style=\"background-color: " .strtoupper($color_background_data['hexString']) . ";\">";
+                        $color.="<p style=\"background-color: " . strtoupper($color_background_data['hexString']) . ";\">";
                     }
                     if (isset($color_foreground_data['hexString'])) {
                         $color.="<p style=\"color: " . strtoupper($color_foreground_data['hexString']) . ";\">";
@@ -981,19 +956,19 @@ class Debug
                 }
                 $this->color_codes[$color_code][0]=$color; // cache value
             } else {
-                if (is_integer($color_code) && $color_code <= $this->Color_Bold_Max) {
+                if (is_integer($color_code) && $color_code <= $this->Color_Display_Level_Bold) {
                     if (isset($color_attributes['bold_on'][1])) {
                         $color.=$color_attributes['bold_on'][1];
                     }
                     if (isset($color_foreground_data['colorId'])) {
-                        $color.="\033[38;5;".(int)$color_foreground_data['colorId']."m";
+                        $color.="\033[38;5;" . (int)$color_foreground_data['colorId'] . "m";
                     }
                 } else {
                     if (isset($color_foreground_data['colorId'])) {
-                        $color.="\033[38;5;".(int)$color_foreground_data['colorId']."m";
+                        $color.="\033[38;5;" . (int)$color_foreground_data['colorId'] . "m";
                     }
                     if (isset($color_background_data['colorId'])) {
-                        $color.="\033[48;5;".(int)$color_background_data['colorId']."m";
+                        $color.="\033[48;5;" . (int)$color_background_data['colorId'] . "m";
                     }
                 }
                 $this->color_codes[$color_code][1]=$color; // cache value
