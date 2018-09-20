@@ -42,9 +42,9 @@ class Debug
      * public properties.
      */
 
-    public $color_bold_max = 9;
-    public $color_luminosity = 5;
-    public $hostname_pad = 2;
+    public $Color_Bold_Max = 9;
+    public $Color_Luminosity = 5;
+    public $Hostname_Pad = 2;
 
     /*
      * private properties.
@@ -619,7 +619,7 @@ class Debug
             // enhanced debuging; includes prefix, plus more
             $debug_format .= str_pad($debug_prefix, $debug_prefix_pad);
             if ($this->Display_Level >= 40) {
-                $debug_format .= ' : ' . str_pad($hostname, $this->hostname_pad);
+                $debug_format .= ' : ' . str_pad($hostname, $this->Hostname_Pad);
             }
             $debug_format .= ' : ' . str_pad($debug_message, $debug_message_pad);
             $debug_format .= ' : ' . $output;
@@ -954,7 +954,7 @@ class Debug
                         $color_luminosity=($color_background_luminosity+0.05) / ($color_foreground_luminosity+0.05);
                     }
 
-                    if ($color_luminosity >= $this->color_luminosity) {
+                    if ($color_luminosity >= $this->Color_Luminosity) {
                         $color_background_data=$json_color;
                         break;
                     }
@@ -964,7 +964,7 @@ class Debug
             }
 
             if ($html) {
-                if (is_integer($color_code) && $color_code <= $this->color_bold_max) {
+                if (is_integer($color_code) && $color_code <= $this->Color_Bold_Max) {
                     if (isset($color_attributes['bold_on'][0])) {
                         $color.=$color_attributes['bold_on'][0];
                     }
@@ -981,7 +981,7 @@ class Debug
                 }
                 $this->color_codes[$color_code][0]=$color; // cache value
             } else {
-                if (is_integer($color_code) && $color_code <= $this->color_bold_max) {
+                if (is_integer($color_code) && $color_code <= $this->Color_Bold_Max) {
                     if (isset($color_attributes['bold_on'][1])) {
                         $color.=$color_attributes['bold_on'][1];
                     }
