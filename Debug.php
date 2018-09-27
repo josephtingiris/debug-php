@@ -242,8 +242,8 @@ class Debug
     {
 
         $this->Stop_Time = microtime(true);
-        $this->debug(__CLASS__ . " start time = " . $this->Start_Time,20);
-        $this->debug(__CLASS__ . " stop time = " . $this->Stop_Time,20);
+        $this->debug(__CLASS__ . " start time = " . $this->Start_Time,50);
+        $this->debug(__CLASS__ . " stop time = " . $this->Stop_Time,50);
 
     }
 
