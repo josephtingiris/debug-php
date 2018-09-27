@@ -234,16 +234,18 @@ class Debug
 
         $this->debug("Class = " . __CLASS__, 20);
 
-        $this->debug("Debug_Level_Source = " . $this->Debug_Level_Source . ", Debug_Level=" . $this->Debug_Level,10);
+        $this->debug("Object = " . get_class($this) . ", Debug_Level_Source = " . $this->Debug_Level_Source . ", Debug_Level=" . $this->Debug_Level,10);
 
     }
 
     public function __destruct()
     {
 
+        $debug_level = 50;
+
         $this->Stop_Time = microtime(true);
-        $this->debug(__CLASS__ . " start time = " . $this->Start_Time,50);
-        $this->debug(__CLASS__ . " stop time = " . $this->Stop_Time,50);
+        $this->debug("Object = " . get_class($this) . ", start time = " . $this->Start_Time,$debug_level);
+        $this->debug("Object = " . get_class($this) . ", stop time = " . $this->Stop_Time,$debug_level);
 
     }
 
@@ -668,6 +670,81 @@ class Debug
 
         $this->debug($output, $debug_level);
 
+    }
+
+    /**
+     * print properties
+     */
+    function properties($export=false, $export_prefix=null)
+    {
+        /*
+         * begin function logic
+         */
+
+        $debug_level = 7;
+
+        $properties=array();
+
+        $exports="";
+
+        $reflect = new \ReflectionClass($this);
+        $reflections = $reflect->getProperties(\ReflectionProperty::IS_PUBLIC);
+
+        foreach($reflections as $reflection) {
+            if (isset($reflection->name) && isset($reflection->class) && $reflection->class == get_class($this)) {
+                $property = $reflection->name;
+                if ($export) {
+                    if (is_string($this->$property)) {
+                        $exports.= "export " . $export_prefix . "_" . $property . "=\"" . trim($this->$property) . "\"\n";
+                    } else {
+                        if (is_array($this->$property) || is_object($this->$property)) {
+                            $exports.= "export " . $export_prefix . "_" . $property . "=(";
+                            foreach ($this->$property as $properties_key => $properties_value) {
+                                if (is_string($properties_value)) {
+                                    $exports.= "\"" . trim($properties_value) . "\" ";
+                                }
+                            }
+                            unset($properties_key, $properties_value);
+                            $exports=trim($exports);
+                            $exports.= ")\n";
+                        }
+                    }
+                } else {
+                    $properties[$property]=$this->$property;
+                }
+                unset($property);
+            }
+        }
+
+        if ($export) {
+            if (!empty($_SERVER["PATH"])) {
+                if (!empty($this->Path)) {
+                    $ack_path=$this->Path . ":" . $_SERVER["PATH"];
+                } else {
+                    $ack_path=$_SERVER["PATH"];
+                }
+                $exports.= "export PATH=\"$ack_path\"\n";
+            }
+            printf("%s\n", $exports);;
+            exit(0);
+        } else {
+            if (!empty($_SERVER) && is_array($_SERVER)) {
+                $this->debug("----------------> _SERVER key/value pairs",50);
+                foreach ($_SERVER as $_SERVER_KEY => $_SERVER_VALUE) {
+                    $this->debugValue("$_SERVER_KEY",50,$_SERVER_VALUE);
+                }
+                $this->debug("----------------< _SERVER key/value pairs",50);
+            }
+            ksort($properties);
+            foreach ($properties as $properties_key => $properties_value) {
+                $this->debugValue($properties_key,9,$properties_value);
+            }
+            unset($properties_key, $properties_value);
+        }
+
+        /*
+         * end function logic
+         */
     }
 
     /**
