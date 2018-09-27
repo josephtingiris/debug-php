@@ -43,8 +43,10 @@ class Debug
      * public properties.
      */
 
-    public $Color_Display_Level_Bold = 9;
+    public $Color_Debug_Level_Bold = 9;
     public $Color_Luminosity = 5;
+    public $Display_Level = null;
+    public $Display_Level_Source = null;
 
     /*
      * private properties.
@@ -84,9 +86,9 @@ class Debug
         if (!$display_level_preferred) {
             if ($debug_level_construct != null && is_integer($debug_level_construct)) {
                 $display_level_preferred = true;
-                $this->Display_Level = $debug_level_construct;
-                $this->Display_Level_Source = "__construct";
-                $this->debug('display level 1 = [' . $this->Display_Level_Source . '] ' . $this->Display_Level, 500);
+                $this->Debug_Level = $debug_level_construct;
+                $this->Debug_Level_Source = "__construct";
+                $this->debug('display level 1 = [' . $this->Debug_Level_Source . '] ' . $this->Debug_Level, 500);
             }
         }
 
@@ -95,9 +97,9 @@ class Debug
         if (!$display_level_preferred) {
             if (isset($GLOBALS['Debug']) && (is_string($GLOBALS['Debug']) || is_integer($GLOBALS['Debug']))) {
                 $display_level_preferred = true;
-                $this->Display_Level = (int)$GLOBALS['Debug'];
-                $this->Display_Level_Source = "GLOBALS(Debug)";
-                $this->debug('display level 2 = [' . $this->Display_Level_Source . '] ' . $this->Display_Level, 500);
+                $this->Debug_Level = (int)$GLOBALS['Debug'];
+                $this->Debug_Level_Source = "GLOBALS(Debug)";
+                $this->debug('display level 2 = [' . $this->Debug_Level_Source . '] ' . $this->Debug_Level, 500);
             }
         }
 
@@ -106,9 +108,9 @@ class Debug
         if (!$display_level_preferred) {
             if (isset($GLOBALS['DEBUG']) && (is_string($GLOBALS['DEBUG']) || is_integer($GLOBALS['DEBUG']))) {
                 $display_level_preferred = true;
-                $this->Display_Level = (int)$GLOBALS['DEBUG'];
-                $this->Display_Level_Source = "GLOBALS(DEBUG)";
-                $this->debug('display level 2 = [' . $this->Display_Level_Source . '] ' . $this->Display_Level, 500);
+                $this->Debug_Level = (int)$GLOBALS['DEBUG'];
+                $this->Debug_Level_Source = "GLOBALS(DEBUG)";
+                $this->debug('display level 2 = [' . $this->Debug_Level_Source . '] ' . $this->Debug_Level, 500);
             }
         }
 
@@ -117,9 +119,9 @@ class Debug
         if (!$display_level_preferred) {
             if (isset($GLOBALS['debug']) && (is_string($GLOBALS['debug']) || is_integer($GLOBALS['debug']))) {
                 $display_level_preferred = true;
-                $this->Display_Level = (int)$GLOBALS['debug'];
-                $this->Display_Level_Source = "GLOBALS(debug)";
-                $this->debug('display level 3 = [' . $this->Display_Level_Source . '] ' . $this->Display_Level, 500);
+                $this->Debug_Level = (int)$GLOBALS['debug'];
+                $this->Debug_Level_Source = "GLOBALS(debug)";
+                $this->debug('display level 3 = [' . $this->Debug_Level_Source . '] ' . $this->Debug_Level, 500);
             }
         }
 
@@ -131,9 +133,9 @@ class Debug
             if (is_integer($env_debug)) {
                 if ($env_debug > 0) {
                     $display_level_preferred = true;
-                    $this->Display_Level = $env_debug;
-                    $this->Display_Level_Source = "env(DEBUG)";
-                    $this->debug('display level 4 = [' . $this->Display_Level_Source . '] ' . $this->Display_Level, 500);
+                    $this->Debug_Level = $env_debug;
+                    $this->Debug_Level_Source = "env(DEBUG)";
+                    $this->debug('display level 4 = [' . $this->Debug_Level_Source . '] ' . $this->Debug_Level, 500);
                 }
             }
         }
@@ -146,9 +148,9 @@ class Debug
             if (is_integer($env_debug)) {
                 if ($env_debug > 0) {
                     $display_level_preferred = true;
-                    $this->Display_Level = $env_debug;
-                    $this->Display_Level_Source = "env(debug)";
-                    $this->debug('display level 5 = [' . $this->Display_Level_Source . '] ' . $this->Display_Level, 500);
+                    $this->Debug_Level = $env_debug;
+                    $this->Debug_Level_Source = "env(debug)";
+                    $this->debug('display level 5 = [' . $this->Debug_Level_Source . '] ' . $this->Debug_Level, 500);
                 }
             }
         }
@@ -183,58 +185,58 @@ class Debug
 
                     if (isset($etc_debug_ini['DEBUG'])) {
                         $display_level_preferred = true;
-                        $this->Display_Level = (int) $etc_debug_ini['DEBUG'];
-                        $this->Display_Level_Source = $etc_debug . "(DEBUG)";
+                        $this->Debug_Level = (int) $etc_debug_ini['DEBUG'];
+                        $this->Debug_Level_Source = $etc_debug . "(DEBUG)";
                     }
 
                     if (!$display_level_preferred) {
                         if (isset($etc_debug_ini['debug'])) {
                             $display_level_preferred = true;
-                            $this->Display_Level = (int) $etc_debug_ini['debug'];
-                            $this->Display_Level_Source = $etc_debug . "(debug)";
+                            $this->Debug_Level = (int) $etc_debug_ini['debug'];
+                            $this->Debug_Level_Source = $etc_debug . "(debug)";
                         }
                     }
 
-                    if (!$display_level_preferred || !is_integer($this->Display_Level)) {
-                        $this->Display_Level = 1;
+                    if (!$display_level_preferred || !is_integer($this->Debug_Level)) {
+                        $this->Debug_Level = 1;
                     }
 
-                    $this->debug('display level 6 = [' . $this->Display_Level_Source . '] ' . $this->Display_Level, 500);
+                    $this->debug('display level 6 = [' . $this->Debug_Level_Source . '] ' . $this->Debug_Level, 500);
                 }
             }
         }
 
         // eighth, force non integer & empty levels to 0
 
-        if (!is_integer($this->Display_Level) || empty($this->Display_Level)) {
-            $this->Display_Level = 0;
-            $this->Display_Level_Source = "empty";
-            $this->debug('display level 7 = [' . $this->Display_Level_Source . '] ' . $this->Display_Level, 500);
+        if (!is_integer($this->Debug_Level) || empty($this->Debug_Level)) {
+            $this->Debug_Level = 0;
+            $this->Debug_Level_Source = "empty";
+            $this->debug('display level 7 = [' . $this->Debug_Level_Source . '] ' . $this->Debug_Level, 500);
         }
 
         // nineth, ensure display_level is an integer, or throw an exception
 
-        if (!is_integer($this->Display_Level)) {
+        if (!is_integer($this->Debug_Level)) {
             throw (new Exception('display_level not an integer'));
-            $this->Display_Level_Source = "non-integer";
-            $this->debug('display level 8 = [' . $this->Display_Level_Source . '] ' . $this->Display_Level, 500);
+            $this->Debug_Level_Source = "non-integer";
+            $this->debug('display level 8 = [' . $this->Debug_Level_Source . '] ' . $this->Debug_Level, 500);
         }
 
         // finally, force negative integers to 0
 
-        if ($this->Display_Level <= 0) {
-            $this->Display_Level = 0;
-            $this->Display_Level_Source = "negative integer";
-            $this->debug('display level 9 = [' . $this->Display_Level_Source . '] ' . $this->Display_Level, 500);
+        if ($this->Debug_Level <= 0) {
+            $this->Debug_Level = 0;
+            $this->Debug_Level_Source = "negative integer";
+            $this->debug('display level 9 = [' . $this->Debug_Level_Source . '] ' . $this->Debug_Level, 500);
         }
 
-        if ($this->Display_Level >= 250) {
+        if ($this->Debug_Level >= 250) {
             $this->debug(__FILE__ . ' loaded', 250);
         }
 
         $this->debug("Class = " . __CLASS__, 20);
 
-        $this->debug("Display_Level_Source = " . $this->Display_Level_Source . ", Display_Level=" . $this->Display_Level,10);
+        $this->debug("Debug_Level_Source = " . $this->Debug_Level_Source . ", Debug_Level=" . $this->Debug_Level,10);
 
     }
 
@@ -273,12 +275,12 @@ class Debug
         }
 
         // get (or set) the global debug level
-        if (empty($this->Display_Level) || $this->Display_Level <= 0) {
-            $this->Display_Level = 0;
+        if (empty($this->Debug_Level) || $this->Debug_Level <= 0) {
+            $this->Debug_Level = 0;
         }
 
         // if the global debug level is greater than the local debug level, then produce debug output
-        if ($this->Display_Level >= $debug_level) {
+        if ($this->Debug_Level >= $debug_level) {
             $display_output = true;
         } else {
             $display_output = false;
@@ -397,32 +399,32 @@ class Debug
         $backtrace_hostname = false; // do not display the hostname
         $backtrace_paths = false; // do not display full paths
 
-        if ($this->Display_Level > 20) {
+        if ($this->Debug_Level > 20) {
             // display files; increase padding
             $backtrace_files = true;
             $debug_pad_message = 25;
         }
 
-        if ($this->Display_Level > 40) {
+        if ($this->Debug_Level > 40) {
             // display dependencies; increase padding
             $backtrace_dependencies = true;
             $debug_pad_message = 50;
         }
 
-        if ($this->Display_Level > 60) {
+        if ($this->Debug_Level > 60) {
             // display classes; increase padding
             $backtrace_classes = true;
             $debug_pad_message = 100;
         }
 
-        if ($this->Display_Level > 80) {
+        if ($this->Debug_Level > 80) {
             // display full paths; increase padding
             $backtrace_paths = true;
             $debug_pad_message = 200;
             $debug_pad_prefix = 16;
         }
 
-        if ($this->Display_Level > 100) {
+        if ($this->Debug_Level > 100) {
             // get (or set) the global hostname
 
             if (empty($GLOBALS['HOSTNAME'])) {
@@ -578,7 +580,7 @@ class Debug
         if (empty($debug_level)) {
             $debug_prefix = str_pad("$debug_tag ", $debug_pad_prefix);
         } else {
-            $debug_prefix = str_pad("$debug_tag [$this->Display_Level][$debug_level]", $debug_pad_prefix);
+            $debug_prefix = str_pad("$debug_tag [$this->Debug_Level][$debug_level]", $debug_pad_prefix);
         }
 
         if (!empty($GLOBALS['UUID'])) {
@@ -661,15 +663,15 @@ class Debug
     }
 
     /**
-     * return determined Display_Level (aka debug_level)
+     * return determined Debug_Level (aka debug_level)
      */
     public function level()
     {
 
-        if (empty($this->Display_Level)) {
+        if (empty($this->Debug_Level)) {
             return 0;
         } else {
-            return $this->Display_Level;
+            return $this->Debug_Level;
         }
 
     }
@@ -755,8 +757,8 @@ class Debug
      * private properties.
      */
 
-    private $Display_Level = null;
-    private $Display_Level_Source = null;
+    private $Debug_Level = null;
+    private $Debug_Level_Source = null;
     private $Start_Time = null;
     private $Stop_Time = null;
 
@@ -939,7 +941,7 @@ class Debug
             }
 
             if ($html) {
-                if (is_integer($color_code) && $color_code <= $this->Color_Display_Level_Bold) {
+                if (is_integer($color_code) && $color_code <= $this->Color_Debug_Level_Bold) {
                     if (isset($color_attributes['bold_on'][0])) {
                         $color.=$color_attributes['bold_on'][0];
                     }
@@ -956,7 +958,7 @@ class Debug
                 }
                 $this->color_codes[$color_code][0]=$color; // cache value
             } else {
-                if (is_integer($color_code) && $color_code <= $this->Color_Display_Level_Bold) {
+                if (is_integer($color_code) && $color_code <= $this->Color_Debug_Level_Bold) {
                     if (isset($color_attributes['bold_on'][1])) {
                         $color.=$color_attributes['bold_on'][1];
                     }
