@@ -45,8 +45,6 @@ class Debug
 
     public $Color_Debug_Level_Bold = 9;
     public $Color_Luminosity = 5;
-    public $Display_Level = null;
-    public $Display_Level_Source = null;
 
     /*
      * private properties.
@@ -252,15 +250,23 @@ class Debug
     public function br($input=null)
     {
 
-        if ($this->modPhp()) {
-            //echo "this is being run via apache";
-            $br = "$input<br />\n";
-        } else {
+        if ($this->cli()) {
             //echo "this is being run via cli";
             $br = "$input\n";
+        } else {
+            //echo "this is not being run via cli";
+            $br = "$input<br />\n";
         }
 
         return $br;
+    }
+
+    /**
+     * return true if it's running via cli else false
+     */
+    function cli()
+    {
+        return (php_sapi_name() === 'cli');
     }
 
     public function debug($output = null, $debug_level = null, $debug_stdout = '', $debug_timestamp = true, $debug_message = null, $debug_line_number = null, $debug_tag = 'DEBUG')
@@ -335,16 +341,9 @@ class Debug
 
         $debug_color = false;
 
-        if ($this->modPhp()) {
-            // if applicable, enable mod_php color output
+        $cli=$this->cli();
 
-            if ($debug_stdout) {
-                $debug_color = true;
-            } else {
-                $debug_color = false;
-                $debug_error_log = true;
-            }
-        } else {
+        if ($cli) {
             // terminals can't use apache error_log()
             $debug_error_log = false;
 
@@ -362,6 +361,15 @@ class Debug
             }
 
             unset($color_term);
+        } else {
+            // if applicable, enable mod_php color output
+
+            if ($debug_stdout) {
+                $debug_color = true;
+            } else {
+                $debug_color = false;
+                $debug_error_log = true;
+            }
         }
 
         // make sure color is off if error_log is on
@@ -614,7 +622,7 @@ class Debug
         }
         $debug_format .= $this->br();
 
-        if ($debug_error_log && $this->modPhp()) {
+        if ($debug_error_log && !$cli) {
             // note;
             // this will strip ANYTHING in between <>, including mail addresses, eg. <noreplay@domain>
             error_log(trim(strip_tags($debug_format)));
@@ -676,23 +684,12 @@ class Debug
 
     }
 
-    public function modPhp()
-    {
-
-        if (!empty($_SERVER['SERVER_NAME'])) {
-            return true;
-        }
-
-        return false;
-
-    }
-
     /* deprecated */
     public function out()
     {
 
         return call_user_func_array(array(
-            $this,
+            __CLASS__,
             'debug',
         ), func_get_args());
 
@@ -703,7 +700,7 @@ class Debug
     {
 
         return call_user_func_array(array(
-            $this,
+            __CLASS__,
             'debugValue',
         ), func_get_args());
 
@@ -714,7 +711,7 @@ class Debug
     {
 
         return call_user_func_array(array(
-            $this,
+            __CLASS__,
             'debugValue',
         ), func_get_args());
 
@@ -725,7 +722,7 @@ class Debug
     {
 
         return call_user_func_array(array(
-            $this,
+            __CLASS__,
             'debugValue',
         ), func_get_args());
 
@@ -784,19 +781,19 @@ class Debug
             }
         }
 
-        $html=$this->modPhp();
+        $cli=$this->cli();
 
         // if it exists then promptly return cached value
         if (!empty($this->color_codes) && isset($this->color_codes[$color_code])) {
-            if ($html) {
-                // html
-                if (isset($this->color_codes[$color_code][0])) {
-                    return $this->color_codes[$color_code][0];
-                }
-            } else {
+            if ($cli) {
                 // ansi (other)
                 if (isset($this->color_codes[$color_code][1])) {
                     return $this->color_codes[$color_code][1];
+                }
+            } else {
+                // html
+                if (isset($this->color_codes[$color_code][0])) {
+                    return $this->color_codes[$color_code][0];
                 }
             }
         }
@@ -822,14 +819,14 @@ class Debug
 
         if (is_string($color_code)) {
             if (isset($color_attributes[$color_code][0]) && isset($color_attributes[$color_code][1])) {
-                if ($html) {
-                    // html
-                    $color.=$color_attributes[$color_code][0];
-                    $this->color_codes[$color_code][0]=$color; // cache value
-                } else {
+                if ($cli) {
                     // ansi
                     $color.=$color_attributes[$color_code][1];
                     $this->color_codes[$color_code][1]=$color; // cache value
+                } else {
+                    // html
+                    $color.=$color_attributes[$color_code][0];
+                    $this->color_codes[$color_code][0]=$color; // cache value
                 }
                 return $color; // return the attribute value
             }
@@ -940,24 +937,8 @@ class Debug
                 unset($json_color);
             }
 
-            if ($html) {
-                if (is_integer($color_code) && $color_code <= $this->Color_Debug_Level_Bold) {
-                    if (isset($color_attributes['bold_on'][0])) {
-                        $color.=$color_attributes['bold_on'][0];
-                    }
-                }
-                if (isset($color_background_data['hexString']) && (isset($color_foreground_data['hexString']))) {
-                    $color.="<p style=\"color: " . strtoupper($color_foreground_data['hexString']) . "; background-color: " . strtoupper($color_background_data['hexString']) . ";\">";
-                } else {
-                    if (isset($color_background_data['hexString'])) {
-                        $color.="<p style=\"background-color: " . strtoupper($color_background_data['hexString']) . ";\">";
-                    }
-                    if (isset($color_foreground_data['hexString'])) {
-                        $color.="<p style=\"color: " . strtoupper($color_foreground_data['hexString']) . ";\">";
-                    }
-                }
-                $this->color_codes[$color_code][0]=$color; // cache value
-            } else {
+            if ($cli) {
+                // cli
                 if (is_integer($color_code) && $color_code <= $this->Color_Debug_Level_Bold) {
                     if (isset($color_attributes['bold_on'][1])) {
                         $color.=$color_attributes['bold_on'][1];
@@ -974,6 +955,24 @@ class Debug
                     }
                 }
                 $this->color_codes[$color_code][1]=$color; // cache value
+            } else {
+                // not cli
+                if (is_integer($color_code) && $color_code <= $this->Color_Debug_Level_Bold) {
+                    if (isset($color_attributes['bold_on'][0])) {
+                        $color.=$color_attributes['bold_on'][0];
+                    }
+                }
+                if (isset($color_background_data['hexString']) && (isset($color_foreground_data['hexString']))) {
+                    $color.="<p style=\"color: " . strtoupper($color_foreground_data['hexString']) . "; background-color: " . strtoupper($color_background_data['hexString']) . ";\">";
+                } else {
+                    if (isset($color_background_data['hexString'])) {
+                        $color.="<p style=\"background-color: " . strtoupper($color_background_data['hexString']) . ";\">";
+                    }
+                    if (isset($color_foreground_data['hexString'])) {
+                        $color.="<p style=\"color: " . strtoupper($color_foreground_data['hexString']) . ";\">";
+                    }
+                }
+                $this->color_codes[$color_code][0]=$color; // cache value
             }
 
             #echo "\ncolor_code=$color_code, foreground rgb = $color_foreground_r,$color_foreground_g,$color_foreground_b = $color_foreground_luminosity\n";
