@@ -50,6 +50,8 @@ class Debug
      * private properties.
      */
 
+    private static $instance = null;
+
     private $color_codes = array();
     private $json_colors = array();
 
@@ -86,7 +88,7 @@ class Debug
                 $display_level_preferred = true;
                 $this->Debug_Level = $debug_level_construct;
                 $this->Debug_Level_Source = "__construct";
-                $this->debug('display level 1 = [' . $this->Debug_Level_Source . '] ' . $this->Debug_Level, 500);
+                self::debug('display level 1 = [' . $this->Debug_Level_Source . '] ' . $this->Debug_Level, 500);
             }
         }
 
@@ -97,7 +99,7 @@ class Debug
                 $display_level_preferred = true;
                 $this->Debug_Level = (int)$GLOBALS['Debug'];
                 $this->Debug_Level_Source = "GLOBALS(Debug)";
-                $this->debug('display level 2 = [' . $this->Debug_Level_Source . '] ' . $this->Debug_Level, 500);
+                self::debug('display level 2 = [' . $this->Debug_Level_Source . '] ' . $this->Debug_Level, 500);
             }
         }
 
@@ -108,7 +110,7 @@ class Debug
                 $display_level_preferred = true;
                 $this->Debug_Level = (int)$GLOBALS['DEBUG'];
                 $this->Debug_Level_Source = "GLOBALS(DEBUG)";
-                $this->debug('display level 2 = [' . $this->Debug_Level_Source . '] ' . $this->Debug_Level, 500);
+                self::debug('display level 2 = [' . $this->Debug_Level_Source . '] ' . $this->Debug_Level, 500);
             }
         }
 
@@ -119,7 +121,7 @@ class Debug
                 $display_level_preferred = true;
                 $this->Debug_Level = (int)$GLOBALS['debug'];
                 $this->Debug_Level_Source = "GLOBALS(debug)";
-                $this->debug('display level 3 = [' . $this->Debug_Level_Source . '] ' . $this->Debug_Level, 500);
+                self::debug('display level 3 = [' . $this->Debug_Level_Source . '] ' . $this->Debug_Level, 500);
             }
         }
 
@@ -133,7 +135,7 @@ class Debug
                     $display_level_preferred = true;
                     $this->Debug_Level = $env_debug;
                     $this->Debug_Level_Source = "env(DEBUG)";
-                    $this->debug('display level 4 = [' . $this->Debug_Level_Source . '] ' . $this->Debug_Level, 500);
+                    self::debug('display level 4 = [' . $this->Debug_Level_Source . '] ' . $this->Debug_Level, 500);
                 }
             }
         }
@@ -148,7 +150,7 @@ class Debug
                     $display_level_preferred = true;
                     $this->Debug_Level = $env_debug;
                     $this->Debug_Level_Source = "env(debug)";
-                    $this->debug('display level 5 = [' . $this->Debug_Level_Source . '] ' . $this->Debug_Level, 500);
+                    self::debug('display level 5 = [' . $this->Debug_Level_Source . '] ' . $this->Debug_Level, 500);
                 }
             }
         }
@@ -199,7 +201,7 @@ class Debug
                         $this->Debug_Level = 1;
                     }
 
-                    $this->debug('display level 6 = [' . $this->Debug_Level_Source . '] ' . $this->Debug_Level, 500);
+                    self::debug('display level 6 = [' . $this->Debug_Level_Source . '] ' . $this->Debug_Level, 500);
                 }
             }
         }
@@ -209,7 +211,7 @@ class Debug
         if (!is_integer($this->Debug_Level) || empty($this->Debug_Level)) {
             $this->Debug_Level = 0;
             $this->Debug_Level_Source = "empty";
-            $this->debug('display level 7 = [' . $this->Debug_Level_Source . '] ' . $this->Debug_Level, 500);
+            self::debug('display level 7 = [' . $this->Debug_Level_Source . '] ' . $this->Debug_Level, 500);
         }
 
         // nineth, ensure display_level is an integer, or throw an exception
@@ -217,7 +219,7 @@ class Debug
         if (!is_integer($this->Debug_Level)) {
             throw (new Exception('display_level not an integer'));
             $this->Debug_Level_Source = "non-integer";
-            $this->debug('display level 8 = [' . $this->Debug_Level_Source . '] ' . $this->Debug_Level, 500);
+            self::debug('display level 8 = [' . $this->Debug_Level_Source . '] ' . $this->Debug_Level, 500);
         }
 
         // finally, force negative integers to 0
@@ -225,16 +227,16 @@ class Debug
         if ($this->Debug_Level <= 0) {
             $this->Debug_Level = 0;
             $this->Debug_Level_Source = "negative integer";
-            $this->debug('display level 9 = [' . $this->Debug_Level_Source . '] ' . $this->Debug_Level, 500);
+            self::debug('display level 9 = [' . $this->Debug_Level_Source . '] ' . $this->Debug_Level, 500);
         }
 
         if ($this->Debug_Level >= 250) {
-            $this->debug(__FILE__ . ' loaded', 250);
+            self::debug(__FILE__ . ' loaded', 250);
         }
 
-        $this->debug("Class = " . __CLASS__, 20);
+        self::debug("Class = " . __CLASS__, 20);
 
-        $this->debug("Object = " . get_class($this) . ", Debug_Level_Source = " . $this->Debug_Level_Source . ", Debug_Level=" . $this->Debug_Level,10);
+        self::debug("Object = " . get_class($this) . ", Debug_Level_Source = " . $this->Debug_Level_Source . ", Debug_Level=" . $this->Debug_Level,10);
 
     }
 
@@ -244,15 +246,22 @@ class Debug
         $debug_level = 50;
 
         $this->Stop_Time = microtime(true);
-        $this->debug("Object = " . get_class($this) . ", start time = " . $this->Start_Time,$debug_level);
-        $this->debug("Object = " . get_class($this) . ", stop time = " . $this->Stop_Time,$debug_level);
+        self::debug("Object = " . get_class($this) . ", start time = " . $this->Start_Time,$debug_level);
+        self::debug("Object = " . get_class($this) . ", stop time = " . $this->Stop_Time,$debug_level);
 
+    }
+
+    public function __instance()
+    {
+        if (!self::$instance) {
+            self::$instance = new self();
+        }
     }
 
     public function br($input=null)
     {
 
-        if ($this->cli()) {
+        if (self::cli()) {
             //echo "this is being run via cli";
             $br = "$input\n";
         } else {
@@ -266,12 +275,12 @@ class Debug
     /**
      * return true if it's running via cli else false
      */
-    function cli()
+    public function cli()
     {
         return (php_sapi_name() === 'cli');
     }
 
-    public function debug($output = null, $debug_level = null, $debug_stdout = '', $debug_timestamp = true, $debug_message = null, $debug_line_number = null, $debug_tag = 'DEBUG')
+    final public function debug($output = null, $debug_level = null, $debug_stdout = '', $debug_timestamp = true, $debug_message = null, $debug_line_number = null, $debug_tag = 'DEBUG')
     {
 
         // cast debug_level as an integer
@@ -343,7 +352,7 @@ class Debug
 
         $debug_color = false;
 
-        $cli=$this->cli();
+        $cli=self::cli();
 
         if ($cli) {
             // terminals can't use apache error_log()
@@ -622,7 +631,7 @@ class Debug
         if ($debug_color && !$debug_error_log) {
             $debug_format .= $this->colorCode('reset');
         }
-        $debug_format .= $this->br();
+        $debug_format .= self::br();
 
         if ($debug_error_log && !$cli) {
             // note;
@@ -636,7 +645,7 @@ class Debug
 
     }
 
-    public function debugValue($variable_name, $debug_level = 9, $variable_comment = null)
+    final public function debugValue($variable_name, $debug_level = 9, $variable_comment = null)
     {
 
         $output = '';
@@ -668,7 +677,7 @@ class Debug
             }
         }
 
-        $this->debug($output, $debug_level);
+        self::debug($output, $debug_level);
 
     }
 
@@ -690,17 +699,23 @@ class Debug
         $reflect = new \ReflectionClass($this);
         $reflections = $reflect->getProperties(\ReflectionProperty::IS_PUBLIC);
 
+        $property_zero=null;
+
         foreach($reflections as $reflection) {
             if (isset($reflection->name) && isset($reflection->class) && $reflection->class == get_class($this)) {
                 $property = $reflection->name;
                 if ($export) {
-                    if (is_string($this->$property)) {
+                    if (preg_match("/zero/i",$property)) {
+                        $property_zero=$this->$property;
+                    }
+
+                    if (is_string($this->$property) || is_bool($this->$property)) {
                         $exports.= "export " . $export_prefix . "_" . $property . "=\"" . trim($this->$property) . "\"\n";
                     } else {
                         if (is_array($this->$property) || is_object($this->$property)) {
                             $exports.= "export " . $export_prefix . "_" . $property . "=(";
                             foreach ($this->$property as $properties_key => $properties_value) {
-                                if (is_string($properties_value)) {
+                                if (is_string($properties_value) || is_bool($properties_value)) {
                                     $exports.= "\"" . trim($properties_value) . "\" ";
                                 }
                             }
@@ -717,6 +732,24 @@ class Debug
         }
 
         if ($export) {
+            if (!empty($property_zero)) {
+                if (is_string($property_zero) || is_bool($property_zero)) {
+                    $exports.= "export " . $export_prefix . "_0" . "=\"" . trim($property_zero) . "\"\n";
+                } else {
+                    if (is_array($property_zero) || is_object($property_zero)) {
+                        $exports.= "export " . $export_prefix . "_0" . "=(";
+                        foreach ($property_zero as $properties_key => $properties_value) {
+                            if (is_string($properties_value) || is_bool($properties_value)) {
+                                $exports.= "\"" . trim($properties_value) . "\" ";
+                            }
+                        }
+                        unset($properties_key, $properties_value);
+                        $exports=trim($exports);
+                        $exports.= ")\n";
+                    }
+                }
+            }
+
             if (!empty($_SERVER["PATH"])) {
                 if (!empty($this->Path)) {
                     $ack_path=$this->Path . ":" . $_SERVER["PATH"];
@@ -729,15 +762,15 @@ class Debug
             exit(0);
         } else {
             if (!empty($_SERVER) && is_array($_SERVER)) {
-                $this->debug("----------------> _SERVER key/value pairs",50);
+                self::debug("----------------> _SERVER key/value pairs",50);
                 foreach ($_SERVER as $_SERVER_KEY => $_SERVER_VALUE) {
-                    $this->debugValue("$_SERVER_KEY",50,$_SERVER_VALUE);
+                    self::debugValue("$_SERVER_KEY",50,$_SERVER_VALUE);
                 }
-                $this->debug("----------------< _SERVER key/value pairs",50);
+                self::debug("----------------< _SERVER key/value pairs",50);
             }
             ksort($properties);
             foreach ($properties as $properties_key => $properties_value) {
-                $this->debugValue($properties_key,9,$properties_value);
+                self::debugValue($properties_key,9,$properties_value);
             }
             unset($properties_key, $properties_value);
         }
@@ -745,6 +778,14 @@ class Debug
         /*
          * end function logic
          */
+    }
+
+    /**
+     * alias for properties()
+     */
+    function propertiesPrint($export=false, $export_prefix=null)
+    {
+        $this->properties($export,$export_prefix);
     }
 
     /**
@@ -808,7 +849,7 @@ class Debug
     public function prototypeFunction()
     {
 
-        $this->debug('Debug World!', 0);
+        self::debug('Debug World!', 0);
 
     }
 
@@ -858,7 +899,7 @@ class Debug
             }
         }
 
-        $cli=$this->cli();
+        $cli=self::cli();
 
         // if it exists then promptly return cached value
         if (!empty($this->color_codes) && isset($this->color_codes[$color_code])) {
