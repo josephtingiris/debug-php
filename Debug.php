@@ -79,18 +79,20 @@ class Debug
         if (empty($this->Start_Time)) {
             $this->Start_Time = microtime(true);
         }
+
         $display_level_preferred = false;
 
         // first, prefer an explicit construct level
 
         if (!$display_level_preferred) {
-            if ($debug_level_construct != null && is_integer($debug_level_construct)) {
+            if (isset($debug_level_construct) && is_integer($debug_level_construct)) {
                 $display_level_preferred = true;
                 $this->Debug_Level = $debug_level_construct;
                 $this->Debug_Level_Source = "__construct";
                 self::debug('display level 1 = [' . $this->Debug_Level_Source . '] ' . $this->Debug_Level, 500);
             }
         }
+
 
         // second, prefer an explicit GLOBALS["Debug"]
 
@@ -485,7 +487,7 @@ class Debug
 
                 #print_r($backtrace); // testing
 
-                if (isset($backtrace['file']) && !is_null($backtrace['file']) && $backtrace['file'] != '' && $backtrace_files) {
+                if (isset($backtrace['file']) && $backtrace['file'] != '' && $backtrace_files) {
 
                     if ($backtrace_paths) {
                         $backtrace_file . $backtrace['file'];
@@ -495,7 +497,7 @@ class Debug
                         $backtrace_file = basename($backtrace['file']);
                     }
 
-                    if (isset($backtrace['line']) && !is_null($backtrace['line']) && $backtrace['line'] != '') {
+                    if (isset($backtrace['line']) && $backtrace['line'] != '') {
                         $backtrace_line = $backtrace['line'];
                     }
 
@@ -507,7 +509,7 @@ class Debug
                 }
 
                 if ($backtrace_classes) {
-                    if (isset($backtrace['class']) && !is_null($backtrace['class']) && $backtrace['class'] != '') {
+                    if (isset($backtrace['class']) && $backtrace['class'] != '') {
 
                         $backtrace_class = null;
 
@@ -516,7 +518,7 @@ class Debug
 
                             $backtrace_class = $backtrace['class'];
 
-                            if (isset($backtrace['function']) && !is_null($backtrace['function']) && $backtrace['function'] != '') {
+                            if (isset($backtrace['function']) && $backtrace['function'] != '') {
                                 $backtrace_function = $backtrace['function'] . '()';
                             }
 
@@ -524,7 +526,7 @@ class Debug
                             // echo "no class ".__CLASS__."\n";
                         }
 
-                        if (!is_null($backtrace_class) && $backtrace_class != '') {
+                        if (isset($backtrace_class) && $backtrace_class != '') {
                             if ($debug_message == null || $debug_message == '') {
                                 $debug_message = $backtrace_class;
                             } else {
@@ -532,7 +534,7 @@ class Debug
                             }
                         }
 
-                        if (!is_null($backtrace_function) && $backtrace_function != '') {
+                        if (isset($backtrace_function) && $backtrace_function != '') {
 
                             // every function but this function ...
                             if ($backtrace['function'] != __FUNCTION__) {
@@ -548,7 +550,7 @@ class Debug
                 }
 
                 if ($backtrace_files) {
-                    if (!is_null($backtrace_file) && $backtrace_file != '') {
+                    if (isset($backtrace_file) && $backtrace_file != '') {
                         if ($debug_message == null || $debug_message == '') {
                             $debug_message = $backtrace_file;
                         } else {
@@ -556,7 +558,7 @@ class Debug
                         }
                     }
 
-                    if (!is_null($backtrace_line) && $backtrace_line != '') {
+                    if (isset($backtrace_line) && $backtrace_line != '') {
                         $debug_message .= ":" . $backtrace_line;
                     }
                 }
@@ -564,11 +566,11 @@ class Debug
                 // only display the first file in backtraces; use preset padding
 
                 if ($debug_message == null || $debug_message == '') {
-                    if (!is_null($backtrace_file) && $backtrace_file != '') {
+                    if (isset($backtrace_file) && $backtrace_file != '') {
                         $debug_message = $backtrace_file;
                     }
 
-                    if (!is_null($backtrace_line) && $backtrace_line != '') {
+                    if (isset($backtrace_line) && $backtrace_line != '') {
                         $debug_message .= ":" . $backtrace_line;
                     }
 
@@ -626,7 +628,7 @@ class Debug
         }
 
         $debug_format .= str_pad($debug_prefix, $debug_pad_prefix);
-        if ($debug_message != null && $debug_message != '') {
+        if (isset($debug_message) && $debug_message != '') {
             $debug_format .= ' : ' . str_pad($debug_message, $debug_pad_message);
         }
         $debug_format .= ' : ' . $output;
@@ -673,11 +675,11 @@ class Debug
                 $output .= print_r($GLOBALS[$variable_name], true);
             }
 
-            if ($variable_comment != '' && $variable_comment != null) {
+            if (isset($variable_comment) && $variable_comment != '') {
                 $output .= " ($variable_comment)";
             }
         } else {
-            if ($variable_comment != '' && $variable_comment != null) {
+            if (isset($variable_comment) && $variable_comment != '') {
                 $output .= "($variable_comment)";
             }
         }
@@ -874,7 +876,7 @@ class Debug
     {
 
         if ($timestamp_force) {
-            if ($timestamp != null && $timestamp != '') {
+            if (isset($timestamp) && $timestamp != '') {
                 $timestamp = date('Y-m-d H:i:s') . ' : ' . $timestamp;
             } else {
                 $timestamp = date('Y-m-d H:i:s');
