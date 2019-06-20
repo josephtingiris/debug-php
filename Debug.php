@@ -682,6 +682,18 @@ class Debug
     }
 
     /**
+     * return true if debug is on
+     */
+    public function is_debug()
+    {
+        if (empty($this->Debug_Level)) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /**
      * print properties
      */
     function properties($export=false, $export_prefix=null)
