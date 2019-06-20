@@ -198,7 +198,12 @@ class Debug
                     }
 
                     if (!$display_level_preferred || !is_integer($this->Debug_Level)) {
-                        $this->Debug_Level = 1;
+                        $etc_debug_line = (int)trim(fgets(fopen($etc_debug, 'r')));
+                        if (is_integer($etc_debug_line)) {
+                            $this->Debug_Level = $etc_debug_line;
+                        } else {
+                            $this->Debug_Level = 1;
+                        }
                     }
 
                     self::debug('display level 6 = [' . $this->Debug_Level_Source . '] ' . $this->Debug_Level, 500);
